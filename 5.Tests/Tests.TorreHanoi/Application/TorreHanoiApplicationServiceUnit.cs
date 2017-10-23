@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using Application.TorreHanoi.Implementation;
+﻿using Application.TorreHanoi.Implementation;
 using Application.TorreHanoi.Interface;
 using Domain.TorreHanoi.Interface.Service;
 using Infrastructure.TorreHanoi.ImagemHelper;
 using Infrastructure.TorreHanoi.Log;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Net;
 
 namespace Tests.TorreHanoi.Application
 {
@@ -25,6 +25,8 @@ namespace Tests.TorreHanoi.Application
             mockLogger.Setup(s => s.Logar(It.IsAny<string>(), It.IsAny<TipoLog>()));
 
             var mockDesignerService = new Mock<IDesignerService>();
+            mockDesignerService.Setup(s => s.Inicializar(It.IsAny<global::Infrastructure.TorreHanoi.ImagemHelper.Dto.TorreHanoiDto>()));
+            mockDesignerService.Setup(s => s.Desenhar()).Returns(new System.Drawing.Bitmap(300, 300));
 
             var mockTorreHanoiDomainService = new Mock<ITorreHanoiDomainService>();
             mockTorreHanoiDomainService.Setup(s => s.Criar(It.IsAny<int>())).Returns(Guid.NewGuid);
@@ -49,7 +51,7 @@ namespace Tests.TorreHanoi.Application
 
         [TestMethod]
         [TestCategory(CategoriaTeste)]
-        public void ObterProcessoPor_Deverar_Retornar_Sucesso()
+        public void ObterProcessoPor_Devera_Retornar_Sucesso()
         {
             var response = _service.ObterProcessoPor(Guid.NewGuid().ToString());
 
@@ -79,7 +81,13 @@ namespace Tests.TorreHanoi.Application
         [TestCategory(CategoriaTeste)]
         public void ObterImagemProcessoPor_Deve_Retornar_Imagem()
         {
-            Assert.Fail();
+            var response = _service.ObterImagemProcessoPor(Guid.NewGuid().ToString());
+
+            Assert.IsNotNull(response);
+            Assert.AreEqual(response.StatusCode, HttpStatusCode.OK);
+            Assert.IsNotNull(response.Imagem);
+            Assert.IsTrue(response.IsValid);
+            Assert.IsTrue(response.MensagensDeErro.Count == 0);
         }
     }
 }
